@@ -8,8 +8,7 @@ from catboost import CatBoostRegressor
 
 from supporting_forecast_fuctions import *
 
-
-
+import matplotlib.pyplot as plt
 
 
 def run_forecast(argv):
@@ -22,8 +21,9 @@ def run_forecast(argv):
     #with open(str(user_id) + '_add_params.json') as json_file:
     #    add_params = json.load(json_file)
 
-    with open(str(user_id) + '_kwargs_model.json') as json_file:
-        kwargs_model  = json.load(json_file)
+    if name_model != 'CATBOOST':
+        with open(str(user_id) + '_kwargs_model.json') as json_file:
+            kwargs_model  = json.load(json_file)
 
     #with open(str(user_id) + '_add_data.json') as json_file:
     #    add_data = pd.read_csv(json_file)
@@ -63,9 +63,9 @@ def run_forecast(argv):
         train_main_series = yf_data
 
         model = SARIMAX(train_main_series['Close'], **kwargs_model).fit()
-        predict_numpy = model.forecast(steps = horizon).values
+        forecast_numpy = model.forecast(steps = horizon).values
 
-        forecast_numpy = evaluate_sarima(train_main_series, kwargs_model)
+        metrics_df = evaluate_sarima(train_main_series, kwargs_model)
         forecast_series = pd.Series(data = forecast_numpy, index=pd.date_range(train_main_series.index[-1], periods=horizon))
         fig_forecast = plot_prediction(train_main_series['Close'],forecast_series)
         #fig.write_image("fig1.png")
@@ -88,10 +88,17 @@ def run_forecast(argv):
         y_pred = model.predict(x_pred)
         diff = y_pred[0] - y_train[-1]
         forecast_numpy = y_pred - diff
-        forecast_series = pd.Series(data = y_pred, index=pd.date_range(train_main_series.index[-1], periods=horizon))
+        forecast_series = pd.Series(data = forecast_numpy, index=pd.date_range(train_main_series.index[-1], periods=horizon))
         fig_forecast = plot_prediction(train_main_series['Close'],forecast_series)
         metrics_df = evaluate_catboost(train_main_series)
     else:
         return 1
 
-    fig_forecast.write_image(str(user_id) + '_forecast.png', engine="orca")
+    fig_forecast.write_image(str(user_id) + '_forecast.png', engine="kaleido")
+
+    with open(str(user_id) + '_metrics_table.txt', 'w') as metrics_file:
+        metrics_file.write(metrics_df.to_markdown())
+
+
+    fig, ax = render_mpl_table(metrics_df.round(2), header_columns=0, col_width=2.0)
+    fig.savefig(str(user_id) + '_metrics_table.png')    

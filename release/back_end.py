@@ -1,9 +1,13 @@
 import yfinance as yf
 import re
+import telebot
+from telebot import types
+import os
+import time
 
-default_p_value = 0
-default_d_value = 0
-default_q_value = 0
+default_p_value = 1
+default_d_value = 1
+default_q_value = 1
 
 #TODO
 def check_ticker(ticker):
@@ -48,6 +52,49 @@ def parse_params_sarimax(params):
             q = result
 
     return {'order' : (p, d, q)}
+
+
+def print_png_and_data(user_id, bot):
+    count = 0
+    while(not (os.path.exists(f"{user_id}_forecast.png") and os.path.exists(f"{user_id}_metrics_table.txt") 
+               and os.path.exists(f"{user_id}_metrics_table.png")) and count <=5):
+        count += 1
+        time.sleep(1)
+    if (count > 5):
+        bot.send_message(user_id, 'Произошла ошибка, попробуйте снова')
+    else:
+        with open (f"{user_id}_forecast.png", 'rb') as png:
+            bot.send_message(user_id, "График предсказания")
+            bot.send_photo(user_id, png)
+        os.remove(f"{user_id}_forecast.png")
+        with open (f"{user_id}_metrics_table.png", 'rb') as png:
+            bot.send_message(user_id, "Метрики за последние 60, 30, 14, 7 дней")
+            bot.send_photo(user_id, png)
+        os.remove(f"{user_id}_metrics_table.png")
+        '''with open (f"{user_id}_metrics_table.txt", 'rb') as file:
+            data = file.read()
+            bot.send_message(user_id, data)'''
+
+    '''while(not os.path.exists(f"{user_id}_metrics_table.png") and count <=5):
+        count += 1
+        time.sleep(1)
+    if (count > 5):
+        bot.send_message(user_id, 'Произошла ошибка, попробуйте снова')
+    else:
+        with open (f"{user_id}_metrics_table.png", 'rb') as png:
+            bot.send_photo(user_id, png)
+        os.remove(f"{user_id}_metrics_table.png")
+
+    while(not os.path.exists(f"{user_id}_metrics_table.txt") and count <=5):
+        count += 1
+        time.sleep(1)
+    if (count > 5):
+        bot.send_message(user_id, 'Произошла ошибка, попробуйте снова')
+    else:
+        with open (f"{user_id}_metrics_table.txt", 'rb') as png:
+            bot.send_document(user_id, png)
+        os.remove(f"{user_id}_metrics_table.txt")'''
+
 
 
 if __name__ == "__main__":
