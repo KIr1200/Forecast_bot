@@ -71,7 +71,7 @@ def print_png_and_data(user_id, bot):
             bot.send_message(user_id, "Метрики за последние 60, 30, 14, 7 дней")
             bot.send_photo(user_id, png)
         os.remove(f"{user_id}_metrics_table.png")
-        with open (f"{user_id}_foo.csv", 'rb') as csv:
+        with open (f"{user_id}_predict.csv", 'rb') as csv:
             bot.send_message(user_id, "Прогноз на указанный горизонт")
             bot.send_document(user_id, csv)
         os.remove(f"{user_id}_predict.csv")
