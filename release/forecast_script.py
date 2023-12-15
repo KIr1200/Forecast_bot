@@ -9,7 +9,8 @@ from catboost import CatBoostRegressor
 from supporting_forecast_fuctions import *
 
 import matplotlib.pyplot as plt
-
+import matplotlib
+matplotlib.use('agg')
 
 def run_forecast(argv):
     print(argv)
