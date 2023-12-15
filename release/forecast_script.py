@@ -104,6 +104,6 @@ def run_forecast(argv):
     fig, ax = render_mpl_table(metrics_df.round(2), header_columns=0, col_width=2.0)
     fig.savefig(str(user_id) + '_metrics_table.png')    
     #np.savetxt(str(user_id)+"_foo.csv", forecast_numpy, delimiter = ",")
-    forecast_series.to_csv(str(user_id)+'_foo.csv', index=True,sep=';', decimal=',')
+    forecast_series.to_csv(str(user_id)+'_predict.csv', index=True,sep=';', decimal=',')
 
 
